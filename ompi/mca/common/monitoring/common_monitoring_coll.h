@@ -55,6 +55,11 @@ OMPI_DECLSPEC int mca_common_monitoring_coll_get_a2a_count(const struct mca_base
 OMPI_DECLSPEC int mca_common_monitoring_coll_get_a2a_size(const struct mca_base_pvar_t *pvar,
                                                           void *value,
                                                           void *obj_handle);
+                                                         
+/* EduMPI modification */
+/*OMPI_DECLSPEC int mca_common_monitoring_get_coll_algorithm(const struct mca_base_pvar_t *pvar,
+                                                    void *value, 
+                                                    void *obj_handle);*/
 
 OMPI_DECLSPEC void mca_common_monitoring_coll_finalize( void );
 END_C_DECLS

@@ -35,6 +35,8 @@
 #include "ompi/mca/coll/base/coll_tags.h"
 #include "ompi/op/op.h"
 #include "coll_tuned.h"
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+
 
 /*
  * The new default fixed decision functions were generated based off of

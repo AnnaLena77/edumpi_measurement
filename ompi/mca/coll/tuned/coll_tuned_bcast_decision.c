@@ -24,6 +24,8 @@
 #include "coll_tuned.h"
 #include "ompi/mca/coll/base/coll_base_topo.h"
 #include "ompi/mca/coll/base/coll_base_util.h"
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
 
 /* bcast algorithm variables */
 static int coll_tuned_bcast_forced_algorithm = 0;
@@ -141,6 +143,13 @@ int ompi_coll_tuned_bcast_intra_do_this(void *buf, int count,
 {
     OPAL_OUTPUT((ompi_coll_tuned_stream,"coll:tuned:bcast_intra_do_this algorithm %d topo faninout %d segsize %d",
                  algorithm, faninout, segsize));
+    
+    if(mca_common_monitoring_enabled){
+        int rank;
+        if(OPAL_SUCCESS == mca_common_monitoring_get_world_rank(root, comm->c_remote_group, &rank)){
+            mca_common_monitoring_record_coll_algorithm(algorithm);
+        }
+    }
 
     switch (algorithm) {
     case (0):
