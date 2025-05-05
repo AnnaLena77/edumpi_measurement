@@ -129,7 +129,7 @@ OMPI_DECLSPEC void mca_common_monitoring_coll_a2a(size_t size, mca_monitoring_co
 //OMPI_DECLSPEC OBJ_CLASS_DECLARATION(mca_monitoring_algo_data_t);
 
 /* Algorithmus zählen */
-OMPI_DECLSPEC void mca_common_monitoring_record_coll_algorithm(int algo_id);
+OMPI_DECLSPEC void mca_common_monitoring_record_coll_algorithm(int op_id, int algo_id);
 
 /* MPI_T Zugriff */
 //OMPI_DECLSPEC int mca_common_get_coll_algorithm(const struct mca_base_pvar_t *pvar,

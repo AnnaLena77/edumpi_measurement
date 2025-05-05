@@ -7,8 +7,25 @@ BEGIN_C_DECLS
 #include "opal/mca/base/mca_base_pvar.h"
 #include "ompi/mca/common/monitoring/common_monitoring.h"
 
-// Maximal unterstützte Anzahl an Algorithmus-IDs
-#define MONITORING_MAX_ALGOS 10
+// Number of operations (details: https://docs.open-mpi.org/en/v5.0.x/tuning-apps/coll-tuned.html)
+/* Allgather  = 0
+   Allgatherv = 1
+   Allreduce  = 2
+   Alltoall   = 3
+   Alltoallv  = 4
+   Barrier    = 6
+   Bcast      = 7
+   Exscan     = 8
+   Gather     = 9
+   Reduce     = 11
+   Reduce_scatter = 12
+   Reduce_scatter_block = 13
+   Scan       = 14
+   Scatter    = 15
+*/
+
+#define NUM_OPS 16
+#define MONITORING_MAX_ALGOS 9 //Bcast has the most (9) different algorithm options
 
 // Zähle einen verwendeten Kollektivalgorithmus
 //void record_coll_algorithm(ompi_communicator_t *comm, int algo_id);
@@ -24,7 +41,9 @@ OMPI_DECLSPEC void mca_common_monitoring_coll_algorithms_init(void);
 // Lies aktuelle Statistik (z.B. für MPI_T PVAR-Zugriff)
 OMPI_DECLSPEC int mca_common_monitoring_get_coll_algorithm(const struct mca_base_pvar_t *pvar,
                                                            void *value,
-                                                           void *obj_handle);
+                                                           void *obj_handle
+                                                           );
+OMPI_DECLSPEC void mca_common_monitoring_coll_algorithms_finalize(void);
 
 END_C_DECLS
 

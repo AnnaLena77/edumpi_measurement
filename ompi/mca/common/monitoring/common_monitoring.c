@@ -214,10 +214,32 @@ static int mca_common_monitoring_comm_size_notify(mca_base_pvar_t *pvar,
     return OMPI_ERROR;
 }
 
+int mca_common_monitoring_array_size_notify(struct mca_base_pvar_t *pvar, 
+                                            mca_base_pvar_event_t event,
+                                            void *obj, int *count) {
+    if (event == MCA_BASE_PVAR_HANDLE_BIND) {
+        // Setze die Anzahl der Werte auf die Anzahl der Elemente im Array
+        // In deinem Fall ist die Array-Größe 16 * 9
+        *count = 16 * 9;  // Dies gibt an, wie viele Werte benötigt werden
+    } 
+    else if (event == MCA_BASE_PVAR_HANDLE_START) {
+        // Hier könntest du Code hinzufügen, um die Performance-Variable zu aktivieren, falls nötig
+    } 
+    else if (event == MCA_BASE_PVAR_HANDLE_STOP) {
+        // Code zum Deaktivieren der Performance-Variable, falls nötig
+    }
+
+    return OMPI_SUCCESS;
+}
+
+
+
 int mca_common_monitoring_init( void )
 {
     if( !mca_common_monitoring_enabled ) return OMPI_ERROR;
     if( 1 < opal_atomic_add_fetch_32(&mca_common_monitoring_hold, 1) ) return OMPI_SUCCESS; /* Already initialized */
+    
+    mca_common_monitoring_coll_algorithms_init();
 
     const char *hostname;
     /* Initialize constant */
@@ -248,6 +270,8 @@ void mca_common_monitoring_finalize( void )
     /* Close the opal_output stream */
     opal_output_close(mca_common_monitoring_output_stream_id);
     free(mca_common_monitoring_output_stream_obj.lds_prefix);
+    
+    mca_common_monitoring_coll_algorithms_finalize();
     /* Free internal data structure */
     free((void *) pml_data);  /* a single allocation */
     opal_hash_table_remove_all( ompi_common_monitoring_translation_ht );
@@ -431,14 +455,15 @@ int mca_common_monitoring_register(void)
                                  MCA_BASE_PVAR_FLAG_READONLY | MCA_BASE_PVAR_FLAG_IWG,
                                  mca_common_monitoring_coll_get_a2a_size, NULL,
                                  mca_common_monitoring_coll_messages_notify, NULL);
-    /* EduMPI modification */                       
+    /* EduMPI modification */     
+                      
     (void)mca_base_pvar_register("ompi", "coll", "monitoring", "algorithm", 
                                  "Name of the algorithm used in collective communication.",
                                  OPAL_INFO_LVL_4, MCA_BASE_PVAR_CLASS_GENERIC,
-                                 MCA_MONITORING_VAR_TYPE, NULL, MPI_T_BIND_MPI_COMM,
+                                 MCA_MONITORING_VAR_TYPE, NULL, MPI_T_BIND_NO_OBJECT,
                                  MCA_BASE_PVAR_FLAG_READONLY | MCA_BASE_PVAR_FLAG_IWG,
                                  mca_common_monitoring_get_coll_algorithm, NULL,
-                                 NULL, NULL);
+                                 mca_common_monitoring_array_size_notify, NULL);
 
     return OMPI_SUCCESS;
 }

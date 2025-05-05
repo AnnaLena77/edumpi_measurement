@@ -147,7 +147,7 @@ int ompi_coll_tuned_bcast_intra_do_this(void *buf, int count,
     if(mca_common_monitoring_enabled){
         int rank;
         if(OPAL_SUCCESS == mca_common_monitoring_get_world_rank(root, comm->c_remote_group, &rank)){
-            mca_common_monitoring_record_coll_algorithm(algorithm);
+            mca_common_monitoring_record_coll_algorithm(7, algorithm);
         }
     }
 
