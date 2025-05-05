@@ -45,6 +45,7 @@ BEGIN_C_DECLS
 
 extern int mca_common_monitoring_output_stream_id;
 extern int mca_common_monitoring_enabled;
+extern int mca_common_monitoring_coll_algorithm_enabled;
 extern int mca_common_monitoring_current_state;
 extern opal_hash_table_t *ompi_common_monitoring_translation_ht;
 

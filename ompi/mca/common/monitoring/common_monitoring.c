@@ -59,6 +59,10 @@ static opal_output_stream_t mca_common_monitoring_output_stream_obj = {
 /*** MCA params to mark the monitoring as enabled. ***/
 /* This signals that the monitoring will hijack the PML, OSC and COLL */
 int mca_common_monitoring_enabled = 0;
+
+//EduMPI modification
+extern int mca_common_monitoring_coll_algorithm_enabled = 0;
+
 int mca_common_monitoring_current_state = 0;
 /* Signals there will be an output of the monitored data at component close */
 static int mca_common_monitoring_output_enabled = 0;
@@ -239,6 +243,7 @@ int mca_common_monitoring_init( void )
     if( !mca_common_monitoring_enabled ) return OMPI_ERROR;
     if( 1 < opal_atomic_add_fetch_32(&mca_common_monitoring_hold, 1) ) return OMPI_SUCCESS; /* Already initialized */
     
+    //EduMPI modification
     mca_common_monitoring_coll_algorithms_init();
 
     const char *hostname;

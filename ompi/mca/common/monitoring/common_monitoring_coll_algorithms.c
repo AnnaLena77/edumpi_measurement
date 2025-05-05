@@ -10,7 +10,7 @@ static opal_atomic_size_t* global_algo_counts = NULL; // NUM_OPS ist die Anzahl 
 
 // Initialize global counter variable
 void mca_common_monitoring_coll_algorithms_init(void) {
-    printf("\ncoll_algorithms_init\n\n");
+    mca_common_monitoring_coll_algorithm_enabled = 1;
     if (global_algo_counts != NULL) return;
     global_algo_counts = (opal_atomic_size_t*)calloc(NUM_OPS * MONITORING_MAX_ALGOS, sizeof(opal_atomic_size_t));
     if (global_algo_counts == NULL) {
@@ -21,8 +21,8 @@ void mca_common_monitoring_coll_algorithms_init(void) {
 }
 
 void mca_common_monitoring_coll_algorithms_finalize(void) {
+    mca_common_monitoring_coll_algorithm_enabled = 0;
     if (global_algo_counts != NULL){
-        printf("\nfree global_algo_counts\n\n");
         free(global_algo_counts);
         global_algo_counts = NULL;
     }

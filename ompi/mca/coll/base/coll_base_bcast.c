@@ -34,6 +34,27 @@
 #include "coll_base_topo.h"
 #include "coll_base_util.h"
 
+//EduMPI modification, needed for counting underlying algorithms
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
+
+
+/* EduMPI - modification for blocking bcast:
+   Bcast (Id=7)
+   
+   0 = basic_linear
+   1 = chain
+   2 = pipeline
+   3 = split_binary_tree
+   4 = binary_tree
+   5 = binomial
+   6 = knomial
+   7 = scatter_allgather
+   8 = scatter_allgather_ring
+*/
+
+#define bcast_id 7
+
 int
 ompi_coll_base_bcast_intra_generic( void* buffer,
                                      int original_count,
@@ -254,6 +275,11 @@ ompi_coll_base_bcast_intra_bintree ( void* buffer,
                                       mca_coll_base_module_t *module,
                                       uint32_t segsize )
 {
+    //EduMPI modification - binary tree (4)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(bcast_id, 4);
+    }
+    
     int segcount = count;
     size_t typelng;
     mca_coll_base_comm_t *data = module->base_data;
@@ -282,6 +308,10 @@ ompi_coll_base_bcast_intra_pipeline( void* buffer,
                                       mca_coll_base_module_t *module,
                                       uint32_t segsize )
 {
+    //EduMPI modification - pipeline (2)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(bcast_id, 2);
+    }
     int segcount = count;
     size_t typelng;
     mca_coll_base_comm_t *data = module->base_data;
@@ -310,6 +340,10 @@ ompi_coll_base_bcast_intra_chain( void* buffer,
                                    mca_coll_base_module_t *module,
                                    uint32_t segsize, int32_t chains )
 {
+    //EduMPI modification - chain (1)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(bcast_id, 1);
+    }
     int segcount = count;
     size_t typelng;
     mca_coll_base_comm_t *data = module->base_data;
@@ -338,6 +372,10 @@ ompi_coll_base_bcast_intra_binomial( void* buffer,
                                       mca_coll_base_module_t *module,
                                       uint32_t segsize )
 {
+    //EduMPI modification - binomial (5)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(bcast_id, 5);
+    }
     int segcount = count;
     size_t typelng;
     mca_coll_base_comm_t *data = module->base_data;
@@ -366,6 +404,10 @@ ompi_coll_base_bcast_intra_split_bintree ( void* buffer,
                                             mca_coll_base_module_t *module,
                                             uint32_t segsize )
 {
+    //EduMPI modification - split binary tree (3)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(bcast_id, 3);
+    }
     int err=0, line, rank, size, segindex, i, lr, pair;
     uint32_t counts[2];
     int segcount[2];       /* Number of elements sent with each segment */
@@ -630,6 +672,10 @@ ompi_coll_base_bcast_intra_basic_linear(void *buff, int count,
                                         struct ompi_communicator_t *comm,
                                         mca_coll_base_module_t *module)
 {
+    //EduMPI modification - basic linear (0)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(bcast_id, 0);
+    }
     int i, size, rank, err;
     ompi_request_t **preq, **reqs;
 
@@ -722,6 +768,10 @@ int ompi_coll_base_bcast_intra_knomial(
     struct ompi_communicator_t *comm, mca_coll_base_module_t *module,
     uint32_t segsize, int radix)
 {
+    //EduMPI modification - knomial (6)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(bcast_id, 6);
+    }
     int segcount = count;
     size_t typesize;
     mca_coll_base_comm_t *data = module->base_data;
@@ -776,6 +826,10 @@ int ompi_coll_base_bcast_intra_scatter_allgather(
     struct ompi_communicator_t *comm, mca_coll_base_module_t *module,
     uint32_t segsize)
 {
+    //EduMPI modification - scatter allgather (7)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(bcast_id, 7);
+    }
     int err = MPI_SUCCESS;
     ptrdiff_t lb, extent;
     size_t datatype_size;
@@ -953,6 +1007,10 @@ int ompi_coll_base_bcast_intra_scatter_allgather_ring(
     struct ompi_communicator_t *comm, mca_coll_base_module_t *module,
     uint32_t segsize)
 {
+    //EduMPI modification - scatter allgather ring (8)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(bcast_id, 8);
+    }
     int err = MPI_SUCCESS;
     ptrdiff_t lb, extent;
     size_t datatype_size;
