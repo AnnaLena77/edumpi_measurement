@@ -41,6 +41,20 @@
 #include "coll_base_util.h"
 #include "opal/util/minmax.h"
 
+//EduMPI modification, needed for counting underlying algorithms
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
+
+
+/* EduMPI - modification for blocking allreduce:
+   Alltoallv (Id=4)
+   
+   0 = basic_linear
+   1 = pairwise
+*/
+
+#define alltoallv_id 4
+
 /*
  * We want to minimize the amount of temporary memory needed while allowing as many ranks
  * to exchange data simultaneously. We use a variation of the ring algorithm, where in a
@@ -198,6 +212,10 @@ ompi_coll_base_alltoallv_intra_pairwise(const void *sbuf, const int *scounts, co
                                          struct ompi_communicator_t *comm,
                                          mca_coll_base_module_t *module)
 {
+    //EduMPI modification - pairwise (1)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(alltoallv_id, 1);
+    }
     int line = -1, err = 0, rank, size, step = 0, sendto, recvfrom;
     size_t sdtype_size, rdtype_size;
     void *psnd, *prcv;
@@ -287,6 +305,10 @@ ompi_coll_base_alltoallv_intra_basic_linear(const void *sbuf, const int *scounts
                                             struct ompi_communicator_t *comm,
                                             mca_coll_base_module_t *module)
 {
+    //EduMPI modification - basic_linear (0)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(alltoallv_id, 0);
+    }
     int i, size, rank, err, nreqs;
     size_t sdtype_size = 0, rdtype_size = 0;
     char *psnd, *prcv;
