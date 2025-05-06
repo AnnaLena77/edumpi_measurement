@@ -40,6 +40,24 @@
 #include "coll_base_topo.h"
 #include "coll_base_util.h"
 
+//EduMPI modification, needed for counting underlying algorithms
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
+
+
+/* EduMPI - modification for blocking allreduce:
+   Allreduce (Id=2)
+   
+   0 = basic_linear
+   1 = nonoverlapping
+   2 = recursive_doubling
+   3 = ring
+   4 = segmented_ring
+   5 = rabenseifner
+*/
+
+#define allreduce_id 2
+
 /*
  * ompi_coll_base_allreduce_intra_nonoverlapping
  *
@@ -58,6 +76,10 @@ ompi_coll_base_allreduce_intra_nonoverlapping(const void *sbuf, void *rbuf, int 
                                                struct ompi_communicator_t *comm,
                                                mca_coll_base_module_t *module)
 {
+    //EduMPI modification - nonoverlapping (1)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allreduce_id, 1);
+    }
     int err, rank;
 
     rank = ompi_comm_rank(comm);
@@ -135,6 +157,10 @@ ompi_coll_base_allreduce_intra_recursivedoubling(const void *sbuf, void *rbuf,
                                                   struct ompi_communicator_t *comm,
                                                   mca_coll_base_module_t *module)
 {
+    //EduMPI modification - recursive_doubling (2)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allreduce_id, 2);
+    }
     int ret, line, rank, size, adjsize, remote, distance;
     int newrank, newremote, extra_ranks;
     char *tmpsend = NULL, *tmprecv = NULL, *tmpswap = NULL, *inplacebuf_free = NULL, *inplacebuf;
@@ -345,6 +371,10 @@ ompi_coll_base_allreduce_intra_ring(const void *sbuf, void *rbuf, int count,
                                      struct ompi_communicator_t *comm,
                                      mca_coll_base_module_t *module)
 {
+    //EduMPI modification - ring (3)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allreduce_id, 3);
+    }
     int ret, line, rank, size, k, recv_from, send_to, block_count, inbi;
     int early_segcount, late_segcount, split_rank, max_segcount;
     size_t typelng;
@@ -623,6 +653,10 @@ ompi_coll_base_allreduce_intra_ring_segmented(const void *sbuf, void *rbuf, int 
                                                mca_coll_base_module_t *module,
                                                uint32_t segsize)
 {
+    //EduMPI modification - segmented_ring (4)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allreduce_id, 4);
+    }
     int ret, line, rank, size, k, recv_from, send_to;
     int early_blockcount, late_blockcount, split_rank;
     int segcount, max_segcount, num_phases, phase, block_count, inbi;
@@ -885,6 +919,10 @@ ompi_coll_base_allreduce_intra_basic_linear(const void *sbuf, void *rbuf, int co
                                              struct ompi_communicator_t *comm,
                                              mca_coll_base_module_t *module)
 {
+    //EduMPI modification - basic_linear (0)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allreduce_id, 0);
+    }
     int err, rank;
 
     rank = ompi_comm_rank(comm);
@@ -973,6 +1011,10 @@ int ompi_coll_base_allreduce_intra_redscat_allgather(
     struct ompi_op_t *op, struct ompi_communicator_t *comm,
     mca_coll_base_module_t *module)
 {
+    //EduMPI modification - rabenseifner (5)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allreduce_id, 5);
+    }
     int *rindex = NULL, *rcount = NULL, *sindex = NULL, *scount = NULL;
 
     int comm_size = ompi_comm_size(comm);
