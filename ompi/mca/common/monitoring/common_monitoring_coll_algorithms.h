@@ -18,11 +18,13 @@ BEGIN_C_DECLS
    Bcast      = 7
    Exscan     = 8
    Gather     = 9
+   Gatherv    = 10 - not available in tuned/base module
    Reduce     = 11
    Reduce_scatter = 12
    Reduce_scatter_block = 13
    Scan       = 14
    Scatter    = 15
+   Scatterv   = 16 - not available in tuned/base module
 */
 
 #define NUM_OPS 16
