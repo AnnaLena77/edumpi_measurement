@@ -24,6 +24,20 @@
 #include "ompi/mca/pml/pml.h"
 #include "ompi/op/op.h"
 
+//EduMPI modification, needed for counting underlying algorithms
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
+
+
+/* EduMPI - modification for blocking exscan:
+   Exscan (Id=8)
+   
+   0 = linear
+   1 = recursive_doubling
+*/
+
+#define exscan_id 8
+
 /*
  * ompi_coll_base_exscan_intra_linear
  *
@@ -38,6 +52,10 @@ ompi_coll_base_exscan_intra_linear(const void *sbuf, void *rbuf, int count,
                                   struct ompi_communicator_t *comm,
                                   mca_coll_base_module_t *module)
 {
+//EduMPI modification - linear (0)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(exscan_id, 0);
+    }
     int size, rank, err;
     ptrdiff_t dsize, gap;
     char *free_buffer = NULL;
@@ -144,6 +162,10 @@ int ompi_coll_base_exscan_intra_recursivedoubling(
     struct ompi_op_t *op, struct ompi_communicator_t *comm,
     mca_coll_base_module_t *module)
 {
+    //EduMPI modification - recursive_doubling (1)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(exscan_id, 1);
+    }
     int err = MPI_SUCCESS;
     char *tmpsend_raw = NULL, *tmprecv_raw = NULL;
     int comm_size = ompi_comm_size(comm);

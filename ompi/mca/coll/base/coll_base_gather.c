@@ -35,6 +35,20 @@
 #include "coll_base_topo.h"
 #include "coll_base_util.h"
 
+//EduMPI modification, needed for counting underlying algorithms
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
+
+
+/* EduMPI - modification for blocking barrier:
+   Barrier (Id=9)
+   
+   0 = linear
+   1 = recursive_doubling
+*/
+
+#define gather_id 9
+
 /* Todo: gather_intra_generic, gather_intra_binary, gather_intra_chain,
  * gather_intra_pipeline, segmentation? */
 int
