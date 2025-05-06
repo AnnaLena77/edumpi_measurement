@@ -13,6 +13,7 @@ BEGIN_C_DECLS
    Allreduce  = 2
    Alltoall   = 3
    Alltoallv  = 4
+   Alltoallw  = 5 - no algorithms defined (only inter/intra)
    Barrier    = 6
    Bcast      = 7
    Exscan     = 8

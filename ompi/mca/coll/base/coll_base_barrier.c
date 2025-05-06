@@ -36,6 +36,24 @@
 #include "coll_base_topo.h"
 #include "coll_base_util.h"
 
+//EduMPI modification, needed for counting underlying algorithms
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
+
+
+/* EduMPI - modification for blocking barrier:
+   Barrier (Id=6)
+   
+   0 = linear
+   1 = double_ring
+   2 = recursive_doubling
+   3 = bruck
+   4 = two_proc
+   5 = tree
+*/
+
+#define barrier_id 6
+
 /**
  * A quick version of the MPI_Sendreceive implemented for the barrier.
  * No actual data is moved across the wire, we use 0-byte messages to
@@ -116,6 +134,10 @@ ompi_coll_base_sendrecv_zero( int dest, int stag,
 int ompi_coll_base_barrier_intra_doublering(struct ompi_communicator_t *comm,
                                              mca_coll_base_module_t *module)
 {
+    //EduMPI modification - double_ring (1)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(barrier_id, 1);
+    }
     int rank, size, err = 0, line = 0, left, right;
 
     size = ompi_comm_size(comm);
@@ -188,6 +210,10 @@ int ompi_coll_base_barrier_intra_doublering(struct ompi_communicator_t *comm,
 int ompi_coll_base_barrier_intra_recursivedoubling(struct ompi_communicator_t *comm,
                                                     mca_coll_base_module_t *module)
 {
+    //EduMPI modification - recursive_doubling (2)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(barrier_id, 2);
+    }
     int rank, size, adjsize, err, line, mask, remote;
 
     size = ompi_comm_size(comm);
@@ -269,7 +295,11 @@ int ompi_coll_base_barrier_intra_recursivedoubling(struct ompi_communicator_t *c
 int ompi_coll_base_barrier_intra_bruck(struct ompi_communicator_t *comm,
                                         mca_coll_base_module_t *module)
 {
-    int rank, size, distance, to, from, err, line = 0;
+    //EduMPI modification - bruck (3)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(barrier_id, 0);
+    }
+    int rank, size, distance, to, from, err, line = 3;
 
     size = ompi_comm_size(comm);
     if( 1 == size )
@@ -307,6 +337,10 @@ int ompi_coll_base_barrier_intra_bruck(struct ompi_communicator_t *comm,
 int ompi_coll_base_barrier_intra_two_procs(struct ompi_communicator_t *comm,
                                             mca_coll_base_module_t *module)
 {
+    //EduMPI modification - two_proc (4)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(barrier_id, 4);
+    }
     int remote, size, err;
 
     size = ompi_comm_size(comm);
@@ -346,6 +380,10 @@ int ompi_coll_base_barrier_intra_two_procs(struct ompi_communicator_t *comm,
 int ompi_coll_base_barrier_intra_basic_linear(struct ompi_communicator_t *comm,
                                               mca_coll_base_module_t *module)
 {
+    //EduMPI modification - linear (0)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(barrier_id, 0);
+    }
     int i, err, rank, size, line;
     ompi_request_t** requests = NULL;
 
@@ -427,6 +465,10 @@ int ompi_coll_base_barrier_intra_basic_linear(struct ompi_communicator_t *comm,
 int ompi_coll_base_barrier_intra_tree(struct ompi_communicator_t *comm,
                                        mca_coll_base_module_t *module)
 {
+    //EduMPI modification - tree (5)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(barrier_id, 5);
+    }
     int rank, size, depth, err, jump, partner;
 
     size = ompi_comm_size(comm);

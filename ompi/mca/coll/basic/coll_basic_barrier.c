@@ -29,7 +29,6 @@
 #include "ompi/mca/coll/base/coll_tags.h"
 #include "coll_basic.h"
 
-
 /*
  *	barrier_intra_log
  *
