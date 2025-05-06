@@ -40,11 +40,12 @@
 #include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
 
 
-/* EduMPI - modification for blocking barrier:
-   Barrier (Id=9)
+/* EduMPI - modification for blocking Gather:
+   Gather (Id=9)
    
-   0 = linear
-   1 = recursive_doubling
+   0 = basic_linear
+   1 = binomial
+   2 = linear_sync
 */
 
 #define gather_id 9
@@ -60,6 +61,10 @@ ompi_coll_base_gather_intra_binomial(const void *sbuf, int scount,
                                       struct ompi_communicator_t *comm,
                                       mca_coll_base_module_t *module)
 {
+    //EduMPI modification - binomial (1)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(gather_id, 1);
+    }
     int line = -1, i, rank, vrank, size, total_recv = 0, err;
     char *ptmp     = NULL, *tempbuf  = NULL;
     ompi_coll_tree_t* bmtree;
@@ -228,6 +233,10 @@ ompi_coll_base_gather_intra_linear_sync(const void *sbuf, int scount,
                                          mca_coll_base_module_t *module,
                                          int first_segment_size)
 {
+    //EduMPI modification - linear_sync (2)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(gather_id, 2);
+    }
     int i, ret, line, rank, size, first_segment_count;
     ompi_request_t **reqs = NULL;
     MPI_Aint extent, lb;
@@ -389,6 +398,10 @@ ompi_coll_base_gather_intra_basic_linear(const void *sbuf, int scount,
                                           struct ompi_communicator_t *comm,
                                           mca_coll_base_module_t *module)
 {
+    //EduMPI modification - basic_linear (0)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(gather_id, 0);
+    }
     int i, err, rank, size;
     char *ptmp;
     MPI_Aint incr, extent, lb;

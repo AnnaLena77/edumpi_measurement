@@ -52,7 +52,7 @@ ompi_coll_base_exscan_intra_linear(const void *sbuf, void *rbuf, int count,
                                   struct ompi_communicator_t *comm,
                                   mca_coll_base_module_t *module)
 {
-//EduMPI modification - linear (0)
+    //EduMPI modification - linear (0)
     if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
         mca_common_monitoring_record_coll_algorithm(exscan_id, 0);
     }
