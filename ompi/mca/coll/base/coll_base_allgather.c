@@ -36,6 +36,25 @@
 #include "coll_base_topo.h"
 #include "coll_base_util.h"
 
+//EduMPI modification, needed for counting underlying algorithms
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
+
+
+/* EduMPI - modification for blocking allgather:
+   Allgather (Id=0)
+   
+   0 = linear
+   1 = bruck-k-fanout
+   2 = recursive doubling
+   3 = ring
+   4 = neighbor
+   5 = two_proc
+   6 = sparbit
+*/
+
+#define allgather_id 0
+
 /*
  * ompi_coll_base_allgather_intra_bruck
  *
@@ -91,6 +110,10 @@ int ompi_coll_base_allgather_intra_bruck(const void *sbuf, int scount,
                                           struct ompi_communicator_t *comm,
                                           mca_coll_base_module_t *module)
 {
+    //EduMPI modification - bruck-k-fanout (1)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allgather_id, 1);
+    }
     int line = -1, rank, size, sendto, recvfrom, distance, blockcount, err = 0;
     ptrdiff_t rlb, rext;
     char *tmpsend = NULL, *tmprecv = NULL;
@@ -259,6 +282,10 @@ ompi_coll_base_allgather_intra_recursivedoubling(const void *sbuf, int scount,
                                                   struct ompi_communicator_t *comm,
                                                   mca_coll_base_module_t *module)
 {
+    //EduMPI modification - recursive_doubling (2)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allgather_id, 2);
+    }
     int line = -1, rank, size, pow2size, err;
     int remote, distance, sendblocklocation;
     ptrdiff_t rlb, rext;
@@ -399,6 +426,10 @@ int ompi_coll_base_allgather_intra_sparbit(const void *sbuf, int scount,
                                                   struct ompi_communicator_t *comm,
                                                   mca_coll_base_module_t *module)
 {
+    //EduMPI modification - sparbit (6)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allgather_id, 6);
+    }
     /* ################# VARIABLE DECLARATION, BUFFER CREATION AND PREPARATION FOR THE ALGORITHM ######################## */
 
     /* list of variable declaration */
@@ -502,6 +533,10 @@ int ompi_coll_base_allgather_intra_ring(const void *sbuf, int scount,
                                          struct ompi_communicator_t *comm,
                                          mca_coll_base_module_t *module)
 {
+    //EduMPI modification - ring (3)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allgather_id, 3);
+    }
     int line = -1, rank, size, err, sendto, recvfrom, i, recvdatafrom, senddatafrom;
     ptrdiff_t rlb, rext;
     char *tmpsend = NULL, *tmprecv = NULL;
@@ -628,6 +663,10 @@ ompi_coll_base_allgather_intra_neighborexchange(const void *sbuf, int scount,
                                                  struct ompi_communicator_t *comm,
                                                  mca_coll_base_module_t *module)
 {
+    //EduMPI modification - neighbor (4)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allgather_id, 4);
+    }
     int line = -1, rank, size, i, even_rank, err;
     int neighbor[2], offset_at_step[2], recv_data_from[2], send_data_from;
     ptrdiff_t rlb, rext;
@@ -742,6 +781,10 @@ int ompi_coll_base_allgather_intra_two_procs(const void *sbuf, int scount,
                                               struct ompi_communicator_t *comm,
                                               mca_coll_base_module_t *module)
 {
+    //EduMPI modification - two_proc (6)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allgather_id, 6);
+    }
     int line = -1, err, rank, remote;
     char *tmpsend = NULL, *tmprecv = NULL;
     ptrdiff_t rext, lb;
@@ -826,6 +869,10 @@ ompi_coll_base_allgather_intra_basic_linear(const void *sbuf, int scount,
                                              struct ompi_communicator_t *comm,
                                              mca_coll_base_module_t *module)
 {
+    //EduMPI modification - linear (0)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allgather_id, 0);
+    }
     int err;
     ptrdiff_t lb, extent;
 

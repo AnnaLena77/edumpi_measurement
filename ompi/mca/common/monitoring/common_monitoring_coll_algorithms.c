@@ -32,7 +32,7 @@ void mca_common_monitoring_coll_algorithms_finalize(void) {
 // Aufruf bei Verwendung eines bestimmten Algorithmus
 void mca_common_monitoring_record_coll_algorithm(int op_id, int algo_id) {
     if (op_id < 0 || op_id >= NUM_OPS || algo_id < 0 || algo_id >= MONITORING_MAX_ALGOS) return;
-    opal_atomic_add_fetch_size_t(&global_algo_counts[algo_id], 1);
+    opal_atomic_add_fetch_size_t(&global_algo_counts[op_id*9+algo_id], 1);
     //printf("Test: %d\n", global_algo_counts[algo_id]);
 }
 
