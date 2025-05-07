@@ -40,6 +40,25 @@
 #include "coll_base_topo.h"
 #include "coll_base_util.h"
 
+//EduMPI modification, needed for counting underlying algorithms
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
+
+
+/* EduMPI - modification for blocking Reduce:
+   Reduce (Id=11)
+   
+   0 = linear
+   1 = chain
+   2 = pipeline
+   3 = binary
+   4 = binomial
+   5 = in-order-binary
+   6 = rabenseifner
+*/
+
+#define reduce_id 11
+
 int mca_coll_base_reduce_local(const void *inbuf, void *inoutbuf, int count,
                                struct ompi_datatype_t * dtype, struct ompi_op_t * op,
                                mca_coll_base_module_t *module)
@@ -389,6 +408,10 @@ int ompi_coll_base_reduce_intra_chain( const void *sendbuf, void *recvbuf, int c
                                         uint32_t segsize, int fanout,
                                         int max_outstanding_reqs )
 {
+    //EduMPI modification - chain (1)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_id, 1);
+    }
     int segcount = count;
     size_t typelng;
     mca_coll_base_module_t *base_module = (mca_coll_base_module_t*) module;
@@ -419,6 +442,10 @@ int ompi_coll_base_reduce_intra_pipeline( const void *sendbuf, void *recvbuf,
                                            uint32_t segsize,
                                            int max_outstanding_reqs  )
 {
+    //EduMPI modification - pipeline (2)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_id, 2);
+    }
     int segcount = count;
     size_t typelng;
     mca_coll_base_module_t *base_module = (mca_coll_base_module_t*) module;
@@ -450,6 +477,10 @@ int ompi_coll_base_reduce_intra_binary( const void *sendbuf, void *recvbuf,
                                          uint32_t segsize,
                                          int max_outstanding_reqs  )
 {
+    //EduMPI modification - linear (3)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_id, 3);
+    }
     int segcount = count;
     size_t typelng;
     mca_coll_base_module_t *base_module = (mca_coll_base_module_t*) module;
@@ -481,6 +512,10 @@ int ompi_coll_base_reduce_intra_binomial( const void *sendbuf, void *recvbuf,
                                            uint32_t segsize,
                                            int max_outstanding_reqs  )
 {
+    //EduMPI modification - binomial (4)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_id, 4);
+    }
     int segcount = count;
     size_t typelng;
     mca_coll_base_module_t *base_module = (mca_coll_base_module_t*) module;
@@ -520,6 +555,10 @@ int ompi_coll_base_reduce_intra_in_order_binary( const void *sendbuf, void *recv
                                                   uint32_t segsize,
                                                   int max_outstanding_reqs  )
 {
+    //EduMPI modification - in-order_binary (5)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_id, 5);
+    }
     int ret, rank, size, io_root, segcount = count;
     void *use_this_sendbuf = NULL;
     void *use_this_recvbuf = NULL;
@@ -645,6 +684,10 @@ ompi_coll_base_reduce_intra_basic_linear(const void *sbuf, void *rbuf, int count
                                          struct ompi_communicator_t *comm,
                                          mca_coll_base_module_t *module)
 {
+    //EduMPI modification - linear (0)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_id, 0);
+    }
     int i, rank, err, size;
     ptrdiff_t extent, dsize, gap = 0;
     char *free_buffer = NULL;
@@ -813,6 +856,10 @@ int ompi_coll_base_reduce_intra_redscat_gather(
     struct ompi_op_t *op, int root, struct ompi_communicator_t *comm,
     mca_coll_base_module_t *module)
 {
+    //EduMPI modification - rabenseifner (6)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_id, 6);
+    }
     int comm_size = ompi_comm_size(comm);
     int rank = ompi_comm_rank(comm);
 

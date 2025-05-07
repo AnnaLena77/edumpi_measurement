@@ -39,6 +39,24 @@
 #include "coll_base_topo.h"
 #include "coll_base_util.h"
 
+//EduMPI modification, needed for counting underlying algorithms
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
+
+
+/* EduMPI - modification for blocking allreduce:
+   Alltoall (Id=3)
+   
+   0 = linear
+   1 = pairwise
+   2 = modified_bruck
+   3 = linear_sync
+   4 = two_proc
+*/
+
+#define alltoall_id 3
+
+
 /*
  * We want to minimize the amount of temporary memory needed while allowing as many ranks
  * to exchange data simultaneously. We use a variation of the ring algorithm, where in a
@@ -184,6 +202,10 @@ int ompi_coll_base_alltoall_intra_pairwise(const void *sbuf, int scount,
                                             struct ompi_communicator_t *comm,
                                             mca_coll_base_module_t *module)
 {
+    //EduMPI modification - pairwise (1)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(alltoall_id, 1);
+    }
     int line = -1, err = 0, rank, size, step, sendto, recvfrom;
     void * tmpsend, *tmprecv;
     ptrdiff_t lb, sext, rext;
@@ -243,6 +265,10 @@ int ompi_coll_base_alltoall_intra_bruck(const void *sbuf, int scount,
                                          struct ompi_communicator_t *comm,
                                          mca_coll_base_module_t *module)
 {
+    //EduMPI modification - modified_bruck (2)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(alltoall_id, 2);
+    }
     int i, line = -1, rank, size, err = 0;
     int sendto, recvfrom, distance, *displs = NULL;
     char *tmpbuf = NULL, *tmpbuf_free = NULL;
@@ -383,6 +409,10 @@ int ompi_coll_base_alltoall_intra_linear_sync(const void *sbuf, int scount,
                                                mca_coll_base_module_t *module,
                                                int max_outstanding_reqs)
 {
+    //EduMPI modification - linear_sync (3)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(alltoall_id, 3);
+    }
     int line, error, ri, si, rank, size, nrreqs, nsreqs, total_reqs;
     int nreqs = 0;
     char *psnd, *prcv;
@@ -541,6 +571,10 @@ int ompi_coll_base_alltoall_intra_two_procs(const void *sbuf, int scount,
                                              struct ompi_communicator_t *comm,
                                              mca_coll_base_module_t *module)
 {
+    //EduMPI modification - two_proc (4)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(alltoall_id, 4);
+    }
     int line = -1, err = 0, rank, remote;
     void * tmpsend, *tmprecv;
     ptrdiff_t sext, rext, lb;
@@ -620,6 +654,10 @@ int ompi_coll_base_alltoall_intra_basic_linear(const void *sbuf, int scount,
                                                struct ompi_communicator_t *comm,
                                                mca_coll_base_module_t *module)
 {
+    //EduMPI modification - linear (0)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(alltoall_id, 0);
+    }
     int i, rank, size, err, line;
     int nreqs = 0;
     char *psnd, *prcv;

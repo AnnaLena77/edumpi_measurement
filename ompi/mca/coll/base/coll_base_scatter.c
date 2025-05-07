@@ -35,6 +35,21 @@
 #include "coll_base_topo.h"
 #include "coll_base_util.h"
 
+//EduMPI modification, needed for counting underlying algorithms
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
+
+
+/* EduMPI - modification for blocking Scatter:
+   Scatter (Id=15)
+   
+   0 = basic_linear
+   1 = binomial
+   2 = linear_nb
+*/
+
+#define scatter_id 15
+
 /*
  * ompi_coll_base_scatter_intra_binomial
  *
@@ -66,6 +81,10 @@ ompi_coll_base_scatter_intra_binomial(
     int root, struct ompi_communicator_t *comm,
     mca_coll_base_module_t *module)
 {
+    //EduMPI modification - binomial (1)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(scatter_id, 1);
+    }
     mca_coll_base_module_t *base_module = (mca_coll_base_module_t*)module;
     mca_coll_base_comm_t *data = base_module->base_data;
     int line = -1, rank, vrank, size, err, packed_size, curr_count;
@@ -227,6 +246,10 @@ ompi_coll_base_scatter_intra_basic_linear(const void *sbuf, int scount,
                                           struct ompi_communicator_t *comm,
                                           mca_coll_base_module_t *module)
 {
+    //EduMPI modification - basic_linear (0)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(scatter_id, 0);
+    }
     int i, rank, size, err;
     ptrdiff_t incr;
     char *ptmp;
@@ -295,6 +318,10 @@ ompi_coll_base_scatter_intra_linear_nb(const void *sbuf, int scount,
                                        mca_coll_base_module_t *module,
                                        int max_reqs)
 {
+    //EduMPI modification - linear_nb (2)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(scatter_id, 2);
+    }
     int i, rank, size, err, line, nreqs;
     ptrdiff_t incr;
     char *ptmp;

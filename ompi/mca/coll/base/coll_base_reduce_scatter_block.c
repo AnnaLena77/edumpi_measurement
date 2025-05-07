@@ -42,6 +42,22 @@
 #include "coll_base_topo.h"
 #include "coll_base_util.h"
 
+//EduMPI modification, needed for counting underlying algorithms
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
+
+
+/* EduMPI - modification for blocking Reduce_Scatter_block:
+   Reduce_Scatter_block (Id=13)
+   
+   0 = basic_linear
+   1 = recursive_doubling
+   2 = recursive_halving
+   3 = butterfly
+*/
+
+#define reduce_scatter_block_id 13
+
 /*
  *	ompi_reduce_scatter_block_basic_linear
  *
@@ -60,6 +76,10 @@ ompi_coll_base_reduce_scatter_block_basic_linear(const void *sbuf, void *rbuf, i
                                                  struct ompi_communicator_t *comm,
                                                  mca_coll_base_module_t *module)
 {
+    //EduMPI modification - basic_linear (0)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_scatter_block_id, 0);
+    }
     int rank, size, err = OMPI_SUCCESS;
     size_t count;
     ptrdiff_t gap, span;
@@ -199,6 +219,10 @@ ompi_coll_base_reduce_scatter_block_intra_recursivedoubling(
     struct ompi_op_t *op, struct ompi_communicator_t *comm,
     mca_coll_base_module_t *module)
 {
+    //EduMPI modification - recursive_doubling (1)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_scatter_block_id, 1);
+    }
     struct ompi_datatype_t *dtypesend = NULL, *dtyperecv = NULL;
     char *tmprecv_raw = NULL, *tmpbuf_raw = NULL, *tmprecv, *tmpbuf;
     ptrdiff_t span, gap, totalcount, extent;
@@ -404,6 +428,10 @@ ompi_coll_base_reduce_scatter_block_intra_recursivehalving(
     struct ompi_op_t *op, struct ompi_communicator_t *comm,
     mca_coll_base_module_t *module)
 {
+    //EduMPI modification - recursive_halving (2)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_scatter_block_id, 2);
+    }
     char *tmprecv_raw = NULL, *tmpbuf_raw = NULL, *tmprecv, *tmpbuf;
     ptrdiff_t span, gap, totalcount, extent;
     int err = MPI_SUCCESS;
@@ -646,6 +674,10 @@ ompi_coll_base_reduce_scatter_block_intra_butterfly(
     struct ompi_op_t *op, struct ompi_communicator_t *comm,
     mca_coll_base_module_t *module)
 {
+    //EduMPI modification - butterfly (3)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_scatter_block_id, 3);
+    }
     char *tmpbuf[2] = {NULL, NULL}, *psend, *precv;
     ptrdiff_t span, gap, totalcount, extent;
     int err = MPI_SUCCESS;

@@ -15,8 +15,9 @@
 
 EXTRA_DIST = profile2mat.pl aggregate_profile.pl README.md
 
-sources = common_monitoring.c common_monitoring_coll.c
-headers = common_monitoring.h common_monitoring_coll.h
+sources = common_monitoring.c common_monitoring_coll.c common_monitoring_coll_algorithms.c
+headers = common_monitoring.h common_monitoring_coll.h common_monitoring_coll_algorithms.h
+
 
 lib_LTLIBRARIES =
 noinst_LTLIBRARIES =

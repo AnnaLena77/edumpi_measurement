@@ -45,6 +45,7 @@ BEGIN_C_DECLS
 
 extern int mca_common_monitoring_output_stream_id;
 extern int mca_common_monitoring_enabled;
+extern int mca_common_monitoring_coll_algorithm_enabled;
 extern int mca_common_monitoring_current_state;
 extern opal_hash_table_t *ompi_common_monitoring_translation_ht;
 
@@ -68,6 +69,9 @@ OMPI_DECLSPEC void mca_common_monitoring_record_osc(int world_rank, size_t data_
 
 /* Records COLL communications. */
 OMPI_DECLSPEC void mca_common_monitoring_record_coll(int world_rank, size_t data_size);
+
+
+//OMPI_DECLSPEC void mca_common_monitoring_record_algorithm(int world_rank, int algo);
 
 /* Translate the rank from the given rank of a process to its rank in MPI_COMM_RANK. */
 static inline int mca_common_monitoring_get_world_rank(int dest, ompi_group_t *group,
@@ -118,6 +122,22 @@ OMPI_DECLSPEC void mca_common_monitoring_coll_release(mca_monitoring_coll_data_t
 OMPI_DECLSPEC void mca_common_monitoring_coll_o2a(size_t size, mca_monitoring_coll_data_t*data);
 OMPI_DECLSPEC void mca_common_monitoring_coll_a2o(size_t size, mca_monitoring_coll_data_t*data);
 OMPI_DECLSPEC void mca_common_monitoring_coll_a2a(size_t size, mca_monitoring_coll_data_t*data);
+
+/* Collective algorithm monitoring */
+//struct mca_monitoring_algo_data_t;
+//typedef struct mca_monitoring_algo_data_t mca_monitoring_algo_data_t;
+
+//OMPI_DECLSPEC OBJ_CLASS_DECLARATION(mca_monitoring_algo_data_t);
+
+/* Algorithmus zählen */
+OMPI_DECLSPEC void mca_common_monitoring_record_coll_algorithm(int op_id, int algo_id);
+
+/* MPI_T Zugriff */
+//OMPI_DECLSPEC int mca_common_get_coll_algorithm(const struct mca_base_pvar_t *pvar,
+                                                //void *value,
+                                                //void *obj_handle);
+
+
 
 END_C_DECLS
 

@@ -37,6 +37,24 @@
 #include "coll_base_topo.h"
 #include "coll_base_util.h"
 
+//EduMPI modification, needed for counting underlying algorithms
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
+
+
+/* EduMPI - modification for blocking allgather:
+   Allgatherv (Id=1)
+   
+   0 = basic default
+   1 = bruck
+   2 = ring
+   3 = neighbor
+   4 = two_proc
+   5 = sparbit
+*/
+
+#define allgatherv_id 1
+
 /*
  * ompi_coll_base_allgatherv_intra_bruck
  *
@@ -100,6 +118,10 @@ int ompi_coll_base_allgatherv_intra_bruck(const void *sbuf, int scount,
                                            struct ompi_communicator_t *comm,
                                            mca_coll_base_module_t *module)
 {
+     //EduMPI modification - bruck (1)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allgatherv_id, 1);
+    }
     int line = -1, err = 0, rank, size, sendto, recvfrom, distance, blockcount, i;
     int *new_rcounts = NULL, *new_rdispls = NULL, *new_scounts = NULL, *new_sdispls = NULL;
     ptrdiff_t rlb, rext;
@@ -264,6 +286,10 @@ int ompi_coll_base_allgatherv_intra_sparbit(const void *sbuf, int scount,
                                            struct ompi_communicator_t *comm,
                                            mca_coll_base_module_t *module)
 {
+     //EduMPI modification - sparbit (5)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allgatherv_id, 5);
+    }
     /* ################# VARIABLE DECLARATION, BUFFER CREATION AND PREPARATION FOR THE ALGORITHM ######################## */
 
     /* list of variable declaration */
@@ -375,6 +401,10 @@ int ompi_coll_base_allgatherv_intra_ring(const void *sbuf, int scount,
                                           struct ompi_communicator_t *comm,
                                           mca_coll_base_module_t *module)
 {
+     //EduMPI modification - ring (2)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allgatherv_id, 2);
+    }
     int line = -1, rank, size, sendto, recvfrom, i, recvdatafrom, senddatafrom, err = 0;
     ptrdiff_t rlb, rext;
     char *tmpsend = NULL, *tmprecv = NULL;
@@ -502,6 +532,10 @@ ompi_coll_base_allgatherv_intra_neighborexchange(const void *sbuf, int scount,
                                                   struct ompi_communicator_t *comm,
                                                   mca_coll_base_module_t *module)
 {
+     //EduMPI modification - neighbor (3)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allgatherv_id, 3);
+    }
     int line = -1, rank, size, i, even_rank, err = 0;
     int neighbor[2], offset_at_step[2], recv_data_from[2], send_data_from;
     int new_scounts[2], new_sdispls[2], new_rcounts[2], new_rdispls[2];
@@ -648,6 +682,10 @@ int ompi_coll_base_allgatherv_intra_two_procs(const void *sbuf, int scount,
                                                struct ompi_communicator_t *comm,
                                                mca_coll_base_module_t *module)
 {
+     //EduMPI modification - two_procs (4)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allgatherv_id, 4);
+    }
     int line = -1, err = 0, rank, remote;
     char *tmpsend = NULL, *tmprecv = NULL;
     ptrdiff_t rext, lb;
@@ -734,6 +772,10 @@ ompi_coll_base_allgatherv_intra_basic_default(const void *sbuf, int scount,
                                               struct ompi_communicator_t *comm,
                                               mca_coll_base_module_t *module)
 {
+    //EduMPI modification - basic default (0)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(allgatherv_id, 0);
+    }
     int size, rank, err;
     MPI_Aint extent, lb;
     char *send_buf = NULL;

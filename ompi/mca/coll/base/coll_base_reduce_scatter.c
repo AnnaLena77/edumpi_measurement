@@ -38,6 +38,22 @@
 #include "coll_base_topo.h"
 #include "coll_base_util.h"
 
+//EduMPI modification, needed for counting underlying algorithms
+#include "ompi/mca/common/monitoring/common_monitoring.h"
+#include "ompi/mca/common/monitoring/common_monitoring_coll_algorithms.h"
+
+
+/* EduMPI - modification for blocking Reduce_Scatter:
+   Reduce_Scatter (Id=12)
+   
+   0 = non-overlapping
+   1 = recursive_halving
+   2 = ring
+   3 = butterfly
+*/
+
+#define reduce_scatter_id 12
+
 /*******************************************************************************
  * ompi_coll_base_reduce_scatter_intra_nonoverlapping
  *
@@ -51,6 +67,10 @@ int ompi_coll_base_reduce_scatter_intra_nonoverlapping(const void *sbuf, void *r
                                                         struct ompi_communicator_t *comm,
                                                         mca_coll_base_module_t *module)
 {
+    //EduMPI modification - non-overlapping (0)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_scatter_id, 0);
+    }
     int err, i, rank, size, total_count, *displs = NULL;
     const int root = 0;
     char *tmprbuf = NULL, *tmprbuf_free = NULL;
@@ -137,6 +157,10 @@ ompi_coll_base_reduce_scatter_intra_basic_recursivehalving( const void *sbuf,
                                                             struct ompi_communicator_t *comm,
                                                             mca_coll_base_module_t *module)
 {
+    //EduMPI modification - recursive_halving (1)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_scatter_id, 1);
+    }
     int i, rank, size, count, err = OMPI_SUCCESS;
     int tmp_size, remain = 0, tmp_rank, *disps = NULL;
     ptrdiff_t extent, buf_size, gap = 0;
@@ -459,6 +483,10 @@ ompi_coll_base_reduce_scatter_intra_ring( const void *sbuf, void *rbuf, const in
                                           struct ompi_communicator_t *comm,
                                           mca_coll_base_module_t *module)
 {
+    //EduMPI modification - ring (2)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_scatter_id, 2);
+    }
     int ret, line, rank, size, i, k, recv_from, send_to, total_count, max_block_count;
     int inbi, *displs = NULL;
     char *tmpsend = NULL, *tmprecv = NULL, *accumbuf = NULL, *accumbuf_free = NULL;
@@ -693,6 +721,10 @@ ompi_coll_base_reduce_scatter_intra_butterfly(
     struct ompi_op_t *op, struct ompi_communicator_t *comm,
     mca_coll_base_module_t *module)
 {
+    //EduMPI modification - butterfly (3)
+    if(mca_common_monitoring_enabled && mca_common_monitoring_coll_algorithm_enabled){
+        mca_common_monitoring_record_coll_algorithm(reduce_scatter_id, 3);
+    }
     char *tmpbuf[2] = {NULL, NULL}, *psend, *precv;
     int *displs = NULL, index;
     ptrdiff_t span, gap, totalcount, extent;

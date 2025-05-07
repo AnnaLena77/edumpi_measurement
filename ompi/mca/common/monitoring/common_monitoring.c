@@ -22,6 +22,7 @@
 #include "ompi_config.h"
 #include "common_monitoring.h"
 #include "common_monitoring_coll.h"
+#include "common_monitoring_coll_algorithms.h"
 #include "ompi/constants.h"
 #include "ompi/communicator/communicator.h"
 #include "opal/mca/base/mca_base_component_repository.h"
@@ -58,6 +59,10 @@ static opal_output_stream_t mca_common_monitoring_output_stream_obj = {
 /*** MCA params to mark the monitoring as enabled. ***/
 /* This signals that the monitoring will hijack the PML, OSC and COLL */
 int mca_common_monitoring_enabled = 0;
+
+//EduMPI modification
+extern int mca_common_monitoring_coll_algorithm_enabled = 0;
+
 int mca_common_monitoring_current_state = 0;
 /* Signals there will be an output of the monitored data at component close */
 static int mca_common_monitoring_output_enabled = 0;
@@ -123,6 +128,8 @@ static int mca_common_monitoring_get_coll_count (const struct mca_base_pvar_t *p
 /* Retrieve the COLL recorded amount of data sent */
 static int mca_common_monitoring_get_coll_size (const struct mca_base_pvar_t *pvar,
                                                 void *value, void *obj_handle);
+                                                
+
 
 /* Set the filename where to output the monitored data */
 static int mca_common_monitoring_set_flush(struct mca_base_pvar_t *pvar,
@@ -211,10 +218,33 @@ static int mca_common_monitoring_comm_size_notify(mca_base_pvar_t *pvar,
     return OMPI_ERROR;
 }
 
+int mca_common_monitoring_array_size_notify(struct mca_base_pvar_t *pvar, 
+                                            mca_base_pvar_event_t event,
+                                            void *obj, int *count) {
+    if (event == MCA_BASE_PVAR_HANDLE_BIND) {
+        // Setze die Anzahl der Werte auf die Anzahl der Elemente im Array
+        // In deinem Fall ist die Array-Größe 16 * 9
+        *count = 16 * 9;  // Dies gibt an, wie viele Werte benötigt werden
+    } 
+    else if (event == MCA_BASE_PVAR_HANDLE_START) {
+        // Hier könntest du Code hinzufügen, um die Performance-Variable zu aktivieren, falls nötig
+    } 
+    else if (event == MCA_BASE_PVAR_HANDLE_STOP) {
+        // Code zum Deaktivieren der Performance-Variable, falls nötig
+    }
+
+    return OMPI_SUCCESS;
+}
+
+
+
 int mca_common_monitoring_init( void )
 {
     if( !mca_common_monitoring_enabled ) return OMPI_ERROR;
     if( 1 < opal_atomic_add_fetch_32(&mca_common_monitoring_hold, 1) ) return OMPI_SUCCESS; /* Already initialized */
+    
+    //EduMPI modification
+    mca_common_monitoring_coll_algorithms_init();
 
     const char *hostname;
     /* Initialize constant */
@@ -245,6 +275,8 @@ void mca_common_monitoring_finalize( void )
     /* Close the opal_output stream */
     opal_output_close(mca_common_monitoring_output_stream_id);
     free(mca_common_monitoring_output_stream_obj.lds_prefix);
+    
+    mca_common_monitoring_coll_algorithms_finalize();
     /* Free internal data structure */
     free((void *) pml_data);  /* a single allocation */
     opal_hash_table_remove_all( ompi_common_monitoring_translation_ht );
@@ -428,6 +460,15 @@ int mca_common_monitoring_register(void)
                                  MCA_BASE_PVAR_FLAG_READONLY | MCA_BASE_PVAR_FLAG_IWG,
                                  mca_common_monitoring_coll_get_a2a_size, NULL,
                                  mca_common_monitoring_coll_messages_notify, NULL);
+    /* EduMPI modification */     
+                      
+    (void)mca_base_pvar_register("ompi", "coll", "monitoring", "algorithm", 
+                                 "Name of the algorithm used in collective communication.",
+                                 OPAL_INFO_LVL_4, MCA_BASE_PVAR_CLASS_GENERIC,
+                                 MCA_MONITORING_VAR_TYPE, NULL, MPI_T_BIND_NO_OBJECT,
+                                 MCA_BASE_PVAR_FLAG_READONLY | MCA_BASE_PVAR_FLAG_IWG,
+                                 mca_common_monitoring_get_coll_algorithm, NULL,
+                                 mca_common_monitoring_array_size_notify, NULL);
 
     return OMPI_SUCCESS;
 }
@@ -695,6 +736,8 @@ static int mca_common_monitoring_get_coll_size(const struct mca_base_pvar_t *pva
 
     return OMPI_SUCCESS;
 }
+
+
 
 static void mca_common_monitoring_output( FILE *pf, int my_rank, int nbprocs )
 {
