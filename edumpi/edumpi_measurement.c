@@ -579,12 +579,18 @@ void finalize_thread_for_rank(void){
 
 // Callback-Funktion für das PERUSE-Event
 int request_activate_cb(peruse_event_h evh, MPI_Aint unique_id, peruse_comm_spec_t *cs, void *param) {
-    printf("test\n");
     qentry* item = &ringbuffer[writer_pos];
-    printf("Test: %s\n", item->function);
     if(item->callback){
-        printf("PERUSE Event! unique_id = %ld\n", (long)unique_id);
         item->req_activate_time = MPI_Wtime();
+    }
+    return PERUSE_SUCCESS;
+}
+
+// Callback-Funktion für das PERUSE-Event
+int request_xfer_cb(peruse_event_h evh, MPI_Aint unique_id, peruse_comm_spec_t *cs, void *param) {
+    qentry* item = &ringbuffer[writer_pos];
+    if(item->callback_){
+        item->req_xfer_time = MPI_Wtime();
     }
     return PERUSE_SUCCESS;
 }
@@ -593,15 +599,22 @@ void initialize_peruse_callbacks(void){
     PERUSE_Init();
 
     peruse_event_h request_activate;
+    peruse_event_h request_xfer;
     int ret;
     // Event registrieren (Message Arrived im Communicator-Kontext)
     ret = PERUSE_Event_comm_register(PERUSE_COMM_REQ_ACTIVATE, MPI_COMM_WORLD, request_activate_cb, NULL, &request_activate);
     if (ret != PERUSE_SUCCESS) {
         MPI_Abort(MPI_COMM_WORLD, 1);
     }
+    ret = PERUSE_Event_comm_register(PERUSE_COMM_REQ_XFER_BEGIN, MPI_COMM_WORLD, request_xfer_cb, NULL, &request_xfer);
+    if (ret != PERUSE_SUCCESS) {
+        MPI_Abort(MPI_COMM_WORLD, 1);
+    }
     // Callback setzen
     PERUSE_Event_comm_callback_set(request_activate, request_activate_cb, NULL);
+    PERUSE_Event_comm_callback_set(request_xfer, request_xfer_cb, NULL);
     // Event aktivieren
     PERUSE_Event_activate(request_activate);
+    PERUSE_Event_activate(request_xfer);
 }
 

@@ -19,6 +19,7 @@ int MPI_Recv(void *buf, int count, MPI_Datatype type, int source, int tag, MPI_C
     }
     
     qentry *item = getWritingRingPos();
+    item->callback = 1;
     clock_gettime(CLOCK_REALTIME, &item->start);
     initQentry(&item, source, "MPI_Recv", 8, 0, 0, "p2p", 3, NULL, type, comm, 1, NULL);
     
@@ -32,7 +33,7 @@ int MPI_Recv(void *buf, int count, MPI_Datatype type, int source, int tag, MPI_C
 
     item->recvcount = received_count;
     item->recvDatasize = received_count * recvtype_size;
-    
+    item->callback = 0;
     return result;
 }
 
@@ -49,6 +50,7 @@ int MPI_Irecv(void *buf, int count, MPI_Datatype type, int source,
     }*/
     
     qentry *item = getWritingRingPos();
+    item->callback = 1;
     clock_gettime(CLOCK_REALTIME, &item->start);
     initQentry(&item, source, "MPI_Irecv", 9, 0, 0, "p2p", 3, NULL, type, comm, 0, NULL);
     item->request = request;
@@ -64,7 +66,7 @@ int MPI_Irecv(void *buf, int count, MPI_Datatype type, int source,
     item->recvDatasize = received_count * recvtype_size;*/
     
     clock_gettime(CLOCK_REALTIME, &item->end);
-    
+    item->callback = 0;
     return result;
 }
 
@@ -80,6 +82,7 @@ int MPI_Mrecv(void *buf, int count, MPI_Datatype type,
         status_helper = status;
     }
     qentry *item = getWritingRingPos();
+    item->callback = 1;
     clock_gettime(CLOCK_REALTIME, &item->start);
     initQentry(&item, -1, "MPI_Mrecv", 9, 0, 0, "p2p", 3, NULL, type, NULL, 1, NULL);
 
@@ -94,7 +97,7 @@ int MPI_Mrecv(void *buf, int count, MPI_Datatype type,
 
     item->recvcount = received_count;
     item->recvDatasize = received_count * recvtype_size;
-    
+    item->callback = 0;
     return result;
 }
 
@@ -110,6 +113,7 @@ int MPI_Imrecv(void *buf, int count, MPI_Datatype type,
         status_helper = status;
     }*/
     qentry *item = getWritingRingPos();
+    item->callback = 1;
     clock_gettime(CLOCK_REALTIME, &item->start);
     initQentry(&item, -1, "MPI_Imrecv", 10, 0, 0, "p2p", 3, type, NULL, NULL, 0, NULL);
     item->request = request;
@@ -125,7 +129,7 @@ int MPI_Imrecv(void *buf, int count, MPI_Datatype type,
 
     item->recvcount = received_count;
     item->recvDatasize = received_count * recvtype_size;*/
-    
+    item->callback = 0;
     return result;
 }
 

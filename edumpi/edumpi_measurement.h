@@ -43,7 +43,9 @@ typedef struct qentry {
     int partnerrank;
     uint8_t coll_partnerranks[50];
     int callback;
+    int callback_;
     double req_activate_time;
+    double req_xfer_time;
     //char sendmode[30]; //later
     //int immediate; //later
     //char usedBtl[30];
