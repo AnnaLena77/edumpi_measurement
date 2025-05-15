@@ -60,7 +60,7 @@ int mca_pml_ob1_isend_init(const void *buf,
 
     MCA_PML_OB1_SEND_REQUEST_INIT(sendreq, buf, count, datatype, dst, tag,
                                   comm, sendmode, true, ob1_proc);
-
+    printf("PERUSE_COMM_REQ_ACTIVATE from isend_init\n");
     PERUSE_TRACE_COMM_EVENT (PERUSE_COMM_REQ_ACTIVATE,
                              &(sendreq)->req_send.req_base,
                              PERUSE_SEND);
@@ -206,7 +206,7 @@ int mca_pml_ob1_isend(const void *buf,
                                   datatype,
                                   dst, tag,
                                   comm, sendmode, false, ob1_proc);
-
+printf("PERUSE_COMM_REQ_ACTIVATE from isend\n");
     PERUSE_TRACE_COMM_EVENT (PERUSE_COMM_REQ_ACTIVATE,
                              &(sendreq)->req_send.req_base,
                              PERUSE_SEND);
@@ -227,7 +227,7 @@ alloc_ft_req:
                                   datatype,
                                   dst, tag,
                                   comm, sendmode, false, ob1_proc);
-
+printf("PERUSE_COMM_REQ_ACTIVATE from isend 2\n");
     PERUSE_TRACE_COMM_EVENT (PERUSE_COMM_REQ_ACTIVATE,
                              &(sendreq)->req_send.req_base,
                              PERUSE_SEND);
@@ -317,7 +317,7 @@ int mca_pml_ob1_send(const void *buf,
 
     MCA_PML_OB1_SEND_REQUEST_INIT(sendreq, buf, count, datatype, dst, tag,
                                   comm, sendmode, false, ob1_proc);
-
+printf("PERUSE_COMM_REQ_ACTIVATE from send\n");
     PERUSE_TRACE_COMM_EVENT (PERUSE_COMM_REQ_ACTIVATE,
                              &sendreq->req_send.req_base,
                              PERUSE_SEND);

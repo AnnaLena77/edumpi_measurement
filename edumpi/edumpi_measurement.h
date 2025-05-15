@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include <mpi.h>
 
+#define MAX_RINGSIZE 1000000
+
 
 extern void enqueue(char** operation, char** datatype, int count, int datasize, char** communicator, int processrank, int partnerrank, time_t ctime);
 extern void initializeMongoDB(void);
@@ -17,6 +19,10 @@ extern int run_thread;
 extern int counter;
 
 void test_function(void);
+void initialize_thread_for_rank(int rank, int world_size);
+void finalize_thread_for_rank(void);
+
+void initialize_peruse_callbacks(void);
 
 typedef struct qentry {
     int id;
@@ -36,13 +42,14 @@ typedef struct qentry {
     int processrank;
     int partnerrank;
     uint8_t coll_partnerranks[50];
-    
-    char sendmode[30]; //later
-    int immediate; //later
-    char usedBtl[30];
-    char usedProtocol[30];
-    int withinEagerLimit;
-    int foundMatchWild;
+    int callback;
+    double req_activate_time;
+    //char sendmode[30]; //later
+    //int immediate; //later
+    //char usedBtl[30];
+    //char usedProtocol[30];
+    //int withinEagerLimit;
+    //int foundMatchWild;
     char usedAlgorithm[30];
     MPI_Request *request;
     struct timespec start;
@@ -52,15 +59,15 @@ typedef struct qentry {
     double sendWaitingTime;
     double recvWaitingTime;
     //struct timeval start;
-    struct timespec initializeRequest;
-    struct timespec startRequest;
+    //struct timespec initializeRequest;
+    //struct timespec startRequest;
     //Completion of the first fragment of a long message that requires an acknowledgement
-    struct timespec requestCompletePmlLevel;
+    //struct timespec requestCompletePmlLevel;
     //Warten auf Recv-Request
-    struct timespec requestWaitCompletion;
-    struct timespec requestFini;
-    struct timespec sent;//later
-    struct timespec bufferFree; //later
+    //struct timespec requestWaitCompletion;
+    //struct timespec requestFini;
+    //struct timespec sent;//later
+    //struct timespec bufferFree; //later
     //struct collective_p2p collectives;
     TAILQ_ENTRY(qentry) pointers;
 } qentry;
@@ -79,6 +86,35 @@ extern int writer_pos;
 extern int reader_pos;
 
 extern void closeFile(void);
+
+/*
+   Structs for initializing PVARS (measurement using MPI_T), code based on monitoring_prof.c, Open MPI
+*/
+
+struct monitoring_pvar
+{
+    char * pvar_name;
+    int pvar_idx;
+    MPI_T_pvar_handle pvar_handle;
+    size_t * start;
+    size_t * end;
+};
+typedef struct monitoring_pvar monitoring_pvar;
+
+/* PML Sent */
+static monitoring_pvar pml_counts;
+static monitoring_pvar pml_sizes;
+/* OSC Sent */
+static monitoring_pvar osc_scounts;
+static monitoring_pvar osc_ssizes;
+/* OSC Recv */
+static monitoring_pvar osc_rcounts;
+static monitoring_pvar osc_rsizes;
+/* COLL Sent/Recv */
+static monitoring_pvar coll_counts;
+static monitoring_pvar coll_sizes;
+
+static MPI_T_pvar_session session;
 
 #endif // EDUMPI_MEASUREMENT_H
 
